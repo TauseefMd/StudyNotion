@@ -94,7 +94,7 @@ exports.updatedSubSection = async (req, res) => {
 }
 
 //deleteSubSection
-exports.deleteSection = async (req, res) => {
+exports.deleteSubSection = async (req, res) => {
     try {
         //fetch section Id - assuming that we are sending Id in params
         const {subSecectionId} = req.params;

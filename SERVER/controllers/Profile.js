@@ -88,11 +88,13 @@ exports.getAllUserDetails = async (req, res) => {
 
         //validation and get user details
         const userdetails = await User.findById(id).populate("additinalDetails").exec();
+        console.log(userdetails);
 
         //return response
         return res.status(200).json({
             success: true,
             message: 'User data fetched successfully',
+            userdetails,
         })
     } catch (error) {
         return res.status(500).json({
