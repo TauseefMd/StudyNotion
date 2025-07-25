@@ -136,7 +136,7 @@ exports.getAllCourses = async (req, res) => {
 };
 
 //get CourseDetails exports
-exports.getCoursesDetaills = async (req,res) => {
+exports.getCourseDetails = async (req,res) => {
     try {
         //get id
         const {courseId} = req.body;

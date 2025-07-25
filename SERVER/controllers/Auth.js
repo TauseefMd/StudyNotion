@@ -9,7 +9,7 @@ const mailSender = require("../utils/mailSender");
 
 
 //send OTP
-exports.sendOTP = async (req, res) => {
+exports.sendotp = async (req, res) => {
     try {
         //fetch email from request ki body
         const {email} = req.body;
@@ -53,7 +53,7 @@ exports.sendOTP = async (req, res) => {
         console.log(otpBody);
 
         //return response successful
-        res,status(200).json({
+        res.status(200).json({
             success: true,
             message: 'OTP Sent Successfully',
             otp,
@@ -85,31 +85,31 @@ exports.signUp = async (req, res) => {
         if(password !== confirmPassword){
             return res.status(400),json({
                 success: false,
-                message: "Password and confirmPassword value does not match, Please try again",
+                message: "Password and confirm Password value does not match, Please try again",
             })
         }
 
         //check user already exists or not
         const existingUser = await User.findOne({email});
         if(existingUser){
-            return res.status(400),json({
+            return res.status(400).json({
                 success: false,
-                message: "User is already registered",
+                message: "User already exists. Please sign in to continue.",
             })
         }
 
         //find most recent OTP stored for the user
         const recentotp = await OTP.find({email}).sort({createdAt:-1}).limit(1);
-        console.log(recentotp);
+        console.log("RecentOTP :" ,recentotp);
 
         //validate OTP
-        if(recentotp.length == 0){
+        if(recentotp.length === 0){
             //OTP not found
             return res.status(400).json({
                 success: false,
                 message: "OTP not found",
             });
-        } else if(otp !== recentotp.otp) {
+        } else if(otp !== recentotp[0].otp) {
             //Invalid OTP 
             return res.status(400).json({
                 success: false,
@@ -119,7 +119,12 @@ exports.signUp = async (req, res) => {
 
         //Hash Password
         const hashedPassword = await bcrypt.hash(password, 10);
+        
+        //create the user
+        let approved = "";
+        approved === "Instructor" ? (approved=false) : (approved=true);
 
+        //vreaye the additional profile for user
         const profileDetails = await Profile.create({
             gender: null,
             dateOfBirth: null,
@@ -128,13 +133,14 @@ exports.signUp = async (req, res) => {
         })
 
         //entry create in DB
-        const user = User.create({
+        const user = await User.create({
             firstName,
             lastName,
             email,
-            password: hashedPassword,
             contactNumber,
+            password: hashedPassword,
             accountType,
+            approved: approved,
             additionalDetails: profileDetails._id,
             image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
         })
@@ -142,7 +148,8 @@ exports.signUp = async (req, res) => {
         //return res
         return res.status(200).json({
             success: true,
-            message: 'User is registered Successfully',
+            message: 'User registered Successfully',
+            user,
         })
     } 
     catch (error) {
