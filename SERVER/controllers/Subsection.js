@@ -22,6 +22,7 @@ exports.createSubSection = async (req, res) => {
 
         //upload video to cloudinary
         const uploadDetails = await uploadImageToCloudinary(video, process.env.FOLDER_NAME);
+        console.log(uploadDetails);
 
         //create a sub section
         const subSectionDetails = await SubSection.create({
@@ -39,8 +40,9 @@ exports.createSubSection = async (req, res) => {
                 },
             },
             {new:true}
-        ).populate(subSectionDetails);
-        //HW: log updated section here, after adding populate query
+        ).populate("subSection");
+
+        console.log(updatedSection);
         //return res
         return res.status(200).json({
             success: true,

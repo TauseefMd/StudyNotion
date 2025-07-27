@@ -169,7 +169,7 @@ exports.login = async (req, res) => {
 
         // validation data
         if(!email || !password){
-            return res.status(403),json({
+            return res.status(403).json({
                 success: false,
                 message: "Either email or password is missing",
             })
@@ -178,7 +178,7 @@ exports.login = async (req, res) => {
         // user check exits or not
         const user = await User.findOne({email}).populate("additionalDetails");
         if(!user){
-            return res.status(401),json({
+            return res.status(401).json({
                 success: false,
                 message: "User is not registered, Please signup first",
             })

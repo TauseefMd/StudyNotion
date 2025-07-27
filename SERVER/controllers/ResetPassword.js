@@ -22,7 +22,7 @@ exports.resetPasswordToken = async (req, res) => {
         const token = crypto.randomUUID();
 
         //update user by adding token and expiration time
-        const updatedDetails = await User.findOne(
+        const updatedDetails = await User.findOneAndUpdate(
             {email:email},
             {
                 token: token,
@@ -43,7 +43,7 @@ exports.resetPasswordToken = async (req, res) => {
             message: 'Email sent successfully, Please check mail and check password'
         });
     } catch (error) {
-        console.error(errror);
+        console.error(error);
         return res.status(500).json({
             success: false,
             message:'Something went wrong while sending reset password mail'
@@ -87,7 +87,7 @@ exports.resetPassword = async (req, res) => {
         };
 
         //hash pwd
-        const hashedPassword = bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         //pwd update
         await User.findOneAndUpdate(
@@ -102,7 +102,7 @@ exports.resetPassword = async (req, res) => {
             message: 'Password reset successful!',
         });
     } catch (error) {
-        console.error(errror);
+        console.error(error);
         return res.status(500).json({
             success: false,
             message:'Something went wrong while reset password!'

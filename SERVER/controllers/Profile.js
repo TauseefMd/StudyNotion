@@ -1,15 +1,16 @@
 const Profile = require("../models/Profile");
 const User = require("../models/User");
+const { uploadImageToCloudinary } = require("../utils/imageUploader");
 
 exports.updateProfile = async (req, res) => {
     try {
         //fetch data
-        const {dateOfBirth="", about="", contactNumber, gender} = req.body;
+        const {dateOfBirth="", about="", contactNumber} = req.body;
         //get userId
         const id = req.user.id;
 
         //validation
-        if(!contactNumber || !gender || !id){
+        if(!contactNumber  || !id){
             return res.status(400).json({
                 success: false,
                 message: 'All field are required!',
@@ -23,7 +24,6 @@ exports.updateProfile = async (req, res) => {
 
         //update profile
         profileDetails.dateOfBirth = dateOfBirth;
-        profileDetails.gender = gender;
         profileDetails.about = about;
         profileDetails.contactNumber = contactNumber;
         await profileDetails.save();
@@ -51,7 +51,7 @@ exports.deleteAccount = async (req, res) => {
         const id = req.user.id;
 
         //Validation
-        const UserDetails = await User.findById({id});
+        const UserDetails = await User.findById({_id :id});
         if(!UserDetails){
             return res.status(404).json({
                 success: false,
@@ -87,7 +87,7 @@ exports.getAllUserDetails = async (req, res) => {
         const id = req.user.id;
 
         //validation and get user details
-        const userdetails = await User.findById(id).populate("additinalDetails").exec();
+        const userdetails = await User.findById(id).populate("additionalDetails").exec();
         console.log(userdetails);
 
         //return response
@@ -129,7 +129,8 @@ exports.updateDisplayPicture = async (req, res) => {
     } catch (error) {
       return res.status(500).json({
         success: false,
-        message: error.message,
+        message: 'Error occured',
+        error: error.message,
       })
     }
 };

@@ -7,7 +7,7 @@ const {uploadImageToCloudinary} = require("../utils/imageUploader");
 exports.createCourse = async (req, res) => {
     try {
         //fetch data
-        const {courseName, courseDescription, whatYouWillLearn, price, tag, category, status, instructions} = req.body;
+        let {courseName, courseDescription, whatYouWillLearn, price, tag, category, status, instructions} = req.body;
 
         //get thumbnail
         const thumbnail = req.files.thumbnailImage;
@@ -28,6 +28,7 @@ exports.createCourse = async (req, res) => {
             accountType: "Instructor",
         });
         console.log(instructorDetails);
+
         //Todo: verify that userId and instructorDetails._id are same or different
 
         if(!instructorDetails){
@@ -38,7 +39,7 @@ exports.createCourse = async (req, res) => {
         }
 
         //check given tag is valid or not
-        const categoryDetails = await Category.findById(tag);
+        const categoryDetails = await Category.findById(category);
         if(!categoryDetails){
             return res.status(404).json({
                 success: false,
@@ -65,7 +66,7 @@ exports.createCourse = async (req, res) => {
 
         //add the new courses to the user schema of instructor
         await User.findByIdAndUpdate(
-            {_id: instructorDetails,_id},
+            {_id: instructorDetails._id},
             {
                 $push: {
                     courses: newCourse._id,
@@ -99,7 +100,7 @@ exports.createCourse = async (req, res) => {
             message: 'Failed to create Course',
             error: error.message,
         })
-    }
+    }  
 };
 
 //getAllCourses handler function
@@ -168,7 +169,7 @@ exports.getCourseDetails = async (req,res) => {
         }
 
         //return response
-        return res.status(400).json({
+        return res.status(200).json({
             succes: true,
             message: 'Course details fetched successfully',
             data: courseDetails,
